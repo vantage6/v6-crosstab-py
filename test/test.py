@@ -11,6 +11,7 @@ installed. This can be done by running:
 
     pip install vantage6-algorithm-tools
 """
+
 from vantage6.algorithm.tools.mock_client import MockAlgorithmClient
 from pathlib import Path
 
@@ -21,53 +22,57 @@ current_path = Path(__file__).parent
 client = MockAlgorithmClient(
     datasets=[
         # Data for first organization
-        [{
-            "database": current_path / "test_data.csv",
-            "db_type": "csv",
-            "input_data": {}
-        }],
+        [
+            {
+                "database": current_path / "test_data.csv",
+                "db_type": "csv",
+                "input_data": {},
+            }
+        ],
         # Data for second organization
-        [{
-            "database": current_path / "test_data.csv",
-            "db_type": "csv",
-            "input_data": {}
-        }]
+        [
+            {
+                "database": current_path / "test_data2.csv",
+                "db_type": "csv",
+                "input_data": {},
+            }
+        ],
     ],
-    module="v6-crosstab-py"
+    module="v6-crosstab-py",
 )
 
 # list mock organizations
 organizations = client.organization.list()
-print(organizations)
 org_ids = [organization["id"] for organization in organizations]
 
 # Run the central method on 1 node and get the results
 central_task = client.task.create(
     input_={
-        "method":"central_crosstab",
+        "method": "central_crosstab",
         "kwargs": {
-            # TODO add sensible values
-            "organizations_to_include": "some_value",
-
-        }
+            "organizations_to_include": org_ids,
+            "results_col": "Gender",
+            "group_cols": ["isOverweight", "AgeGroup"],
+            # "group_cols": ["isOverweight"],
+        },
     },
     organizations=[org_ids[0]],
 )
 results = client.wait_for_results(central_task.get("id"))
 print(results)
 
-# Run the partial method for all organizations
-task = client.task.create(
-    input_={
-        "method":"partial_crosstab",
-        "kwargs": {
-            # TODO define parameters for function 'partial_crosstab'
-        }
-    },
-    organizations=org_ids
-)
-print(task)
+# # Run the partial method for all organizations
+# task = client.task.create(
+#     input_={
+#         "method": "partial_crosstab",
+#         "kwargs": {
+#             "results_col": "Gender",
+#             "group_cols": ["isOverweight", "AgeGroup"],
+#         },
+#     },
+#     organizations=[org_ids[0]],
+# )
 
-# Get the results from the task
-results = client.wait_for_results(task.get("id"))
-print(results)
+# # Get the results from the task
+# results = client.wait_for_results(task.get("id"))
+# print(results)
