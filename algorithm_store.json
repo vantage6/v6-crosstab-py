@@ -1,6 +1,6 @@
 {
   "name": "Contingency table",
-  "image": "harbor2.vantage6.ai/algorithms/v6-crosstab-py:v4",
+  "image": "harbor2.vantage6.ai/algorithms/crosstab:v4",
   "vantage6_version": "4.3",
   "partitioning": "horizontal",
   "functions": [
@@ -10,6 +10,16 @@
       "type": "central",
       "databases": [],
       "arguments": [
+        {
+          "name": "results_col",
+          "type": "column",
+          "description": "Column to count. Will be used as the columns in the contingency table"
+        },
+        {
+          "name": "group_cols",
+          "type": "list[column]",
+          "description": "One or more columns to group by. Will be used as the rows in the contingency table"
+        },
         {
           "name": "organizations_to_include",
           "type": "organizations",
@@ -23,10 +33,21 @@
       "type": "federated",
       "databases": [
         {
-          "name": "Database 1"
+          "name": "Database"
         }
       ],
-      "arguments": []
+      "arguments": [
+        {
+          "name": "results_col",
+          "type": "column",
+          "description": "Column to count. Will be used as the columns in the contingency table"
+        },
+        {
+          "name": "group_cols",
+          "type": "list[column]",
+          "description": "One or more columns to group by. Will be used as the rows in the contingency table"
+        }
+      ]
     }
   ]
 }
