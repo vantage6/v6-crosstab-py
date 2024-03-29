@@ -1,0 +1,32 @@
+{
+  "name": "Contingency table",
+  "image": "harbor2.vantage6.ai/algorithms/v6-crosstab-py:v4",
+  "vantage6_version": "4.3",
+  "partitioning": "horizontal",
+  "functions": [
+    {
+      "name": "central_crosstab",
+      "description": "Create a contingency table showing the relationship between two or more variables",
+      "type": "central",
+      "databases": [],
+      "arguments": [
+        {
+          "name": "organizations_to_include",
+          "type": "organizations",
+          "description": "Organizations to be included in the analysis"
+        }
+      ]
+    },
+    {
+      "name": "partial_crosstab",
+      "description": "",
+      "type": "federated",
+      "databases": [
+        {
+          "name": "Database 1"
+        }
+      ],
+      "arguments": []
+    }
+  ]
+}
