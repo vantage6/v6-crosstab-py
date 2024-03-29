@@ -21,8 +21,8 @@ jobs:
             password: ${{ secrets.DOCKER_PASSWORD }}
 
         - name: Run Makefile Rule
-          run: docker build -t harbor2.vantage6.ai/algorithms/v6-crosstab-py:v4 .
+          run: docker build -t harbor2.vantage6.ai/algorithms/crosstab:v4 .
 
         - name: Push Docker image
           run: |
-            docker push harbor2.vantage6.ai/algorithms/v6-crosstab-py:v4
+            docker push harbor2.vantage6.ai/algorithms/crosstab:v4

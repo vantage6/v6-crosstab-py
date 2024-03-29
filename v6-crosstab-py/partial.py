@@ -13,7 +13,11 @@ from typing import Any
 from vantage6.algorithm.tools.util import info, warn, error
 from vantage6.algorithm.tools.decorators import data
 
-PRIVACY_THRESHOLD = 5
+# TODO decide if/how this should be settable
+from .globals import PRIVACY_THRESHOLD, BELOW_THRESHOLD_PLACEHOLDER
+
+# TODO should this be settable?
+MINIMUM_ROWS_TOTAL = 10
 
 
 @data(1)
@@ -34,22 +38,44 @@ def partial_crosstab(
     group_cols : list[str]
         List of one or more columns to group the data by.
     """
-    # TODO check that results col + group cols are categorical
+    # Check if dataframe contains enough rows
+    if len(df) < MINIMUM_ROWS_TOTAL:
+        raise ValueError(
+            f"Dataframe contains less than {MINIMUM_ROWS_TOTAL} rows. Refusing to "
+            "handle this computation, as it may lead to privacy issues."
+        )
 
     # Fill empty (categorical) values with "N/A"
     df = df.fillna("N/A")
 
     # Create contingency table
     cross_tab_df = (
-        df.groupby(group_cols + results_col, dropna=False)[results_col]
+        df.groupby(group_cols + [results_col], dropna=False)[results_col]
         .count()
         .unstack(level=results_col)
-        # TODO get rid of copy?
-        .copy()
+        .fillna(0)
+        .astype(int)
     )
 
-    # TODO Check that all values are higher than the threshold
-    # TODO if no values are higher than the threshold, return an error
-    print(cross_tab_df)
+    # if no values are higher than the threshold, return an error
+    if not (cross_tab_df > PRIVACY_THRESHOLD).any().any():
+        raise ValueError(
+            "No values in the contingency table are higher than the privacy threshold "
+            f"of {PRIVACY_THRESHOLD}. Please check if you submitted categorical "
+            "variables - if you did, there may simply not be enough data at this node."
+        )
 
-    return cross_tab_df
+    # Replace too low values with a privacy-preserving value
+    if PRIVACY_THRESHOLD > 0:
+        cross_tab_df.where(cross_tab_df > PRIVACY_THRESHOLD, 0, inplace=True)
+
+    # Cast to string to ensure it can be read again. Also, set zero values to ranges
+    # indicating that the value is below the threshold
+    cross_tab_df = cross_tab_df.astype(str).where(
+        cross_tab_df > PRIVACY_THRESHOLD, BELOW_THRESHOLD_PLACEHOLDER
+    )
+    # reset index to ensure that groups are passed along to central part
+    cross_tab_df = cross_tab_df.reset_index()
+
+    # Cast results to string to ensure they can be read again
+    return cross_tab_df.astype(str).to_json(orient="records")
