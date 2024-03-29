@@ -67,7 +67,6 @@ def central_crosstab(
     # wait for node to return results of the subtask.
     info("Waiting for results")
     results = client.wait_for_results(task_id=task.get("id"))
-    print(results)
     info("Results obtained!")
 
     # return the final results of the algorithm

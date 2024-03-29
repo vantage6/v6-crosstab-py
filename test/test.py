@@ -12,8 +12,8 @@ installed. This can be done by running:
     pip install vantage6-algorithm-tools
 """
 
-from vantage6.algorithm.tools.mock_client import MockAlgorithmClient
 from pathlib import Path
+from vantage6.algorithm.tools.mock_client import MockAlgorithmClient
 
 # get path of current directory
 current_path = Path(__file__).parent

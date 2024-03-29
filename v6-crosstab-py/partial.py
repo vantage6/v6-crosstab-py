@@ -16,6 +16,9 @@ from vantage6.algorithm.tools.decorators import data
 # TODO decide if/how this should be settable
 from .globals import PRIVACY_THRESHOLD, BELOW_THRESHOLD_PLACEHOLDER
 
+# TODO should this be settable?
+MINIMUM_ROWS_TOTAL = 10
+
 
 @data(1)
 def partial_crosstab(
@@ -35,7 +38,12 @@ def partial_crosstab(
     group_cols : list[str]
         List of one or more columns to group the data by.
     """
-    # TODO check that results col + group cols are categorical
+    # Check if dataframe contains enough rows
+    if len(df) < MINIMUM_ROWS_TOTAL:
+        raise ValueError(
+            f"Dataframe contains less than {MINIMUM_ROWS_TOTAL} rows. Refusing to "
+            "handle this computation, as it may lead to privacy issues."
+        )
 
     # Fill empty (categorical) values with "N/A"
     df = df.fillna("N/A")
@@ -57,8 +65,6 @@ def partial_crosstab(
             "variables - if you did, there may simply not be enough data at this node."
         )
 
-    # TODO is a value of zero allowed?
-    # TODO > or >= to threshold? Otherwise placeholder should also be changed
     # Replace too low values with a privacy-preserving value
     if PRIVACY_THRESHOLD > 0:
         cross_tab_df.where(cross_tab_df > PRIVACY_THRESHOLD, 0, inplace=True)
