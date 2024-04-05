@@ -45,14 +45,13 @@ def partial_crosstab(
     PRIVACY_THRESHOLD = _convert_envvar_to_int(
         "CROSSTAB_PRIVACY_THRESHOLD", DEFAULT_PRIVACY_THRESHOLD
     )
-    MINIMUM_ROWS_TOTAL = _convert_envvar_to_int(
-        "CROSSTAB_MINIMUM_ROWS_TOTAL", DEFAULT_MINIMUM_ROWS_TOTAL
-    )
     ALLOW_ZERO = _convert_envvar_to_bool("CROSSTAB_ALLOW_ZERO", DEFAULT_ALLOW_ZERO)
 
     # check if env var values are compatible
     info("Checking privacy settings before starting...")
-    _do_prestart_privacy_checks(df, PRIVACY_THRESHOLD, ALLOW_ZERO, MINIMUM_ROWS_TOTAL)
+    _do_prestart_privacy_checks(
+        df, group_cols + [results_col], PRIVACY_THRESHOLD, ALLOW_ZERO
+    )
 
     # Fill empty (categorical) values with "N/A"
     df = df.fillna("N/A")
@@ -112,7 +111,10 @@ def partial_crosstab(
 
 
 def _do_prestart_privacy_checks(
-    df: pd.DataFrame, privacy_threshold: int, allow_zero: bool, minimum_rows_total: int
+    df: pd.DataFrame,
+    requested_columns: list[str],
+    privacy_threshold: int,
+    allow_zero: bool,
 ) -> None:
     """
     Perform privacy checks before starting the computation.
@@ -121,13 +123,16 @@ def _do_prestart_privacy_checks(
     ----------
     df : pd.DataFrame
         The dataframe containing the data.
+    requested_columns : list[str]
+        The columns requested for the computation.
     privacy_threshold : int
         The privacy threshold value.
     allow_zero : bool
         The flag indicating whether zero values are allowed.
-    minimum_rows_total : int
-        The minimum number of rows to be found in the supplied dataframe.
     """
+    minimum_rows_total = _convert_envvar_to_int(
+        "CROSSTAB_MINIMUM_ROWS_TOTAL", DEFAULT_MINIMUM_ROWS_TOTAL
+    )
 
     if privacy_threshold == 0 and not allow_zero:
         raise ValueError(
@@ -141,6 +146,28 @@ def _do_prestart_privacy_checks(
             f"Dataframe contains less than {minimum_rows_total} rows. Refusing to "
             "handle this computation, as it may lead to privacy issues."
         )
+
+    # Check if requested columns are allowed
+    allowed_columns = get_env_var("CROSSTAB_ALLOWED_COLUMNS")
+    if allowed_columns:
+        allowed_columns = allowed_columns.split(",")
+        for col in requested_columns:
+            if col not in allowed_columns:
+                raise ValueError(
+                    f"The node administrator does not allow '{col}' to be requested in "
+                    "this algorithm computation. Please contact the node administrator "
+                    "for more information."
+                )
+    non_allowed_collumns = get_env_var("CROSSTAB_DISALLOWED_COLUMNS")
+    if non_allowed_collumns:
+        non_allowed_collumns = non_allowed_collumns.split(",")
+        for col in requested_columns:
+            if col in non_allowed_collumns:
+                raise ValueError(
+                    f"The node administrator does not allow '{col}' to be requested in "
+                    "this algorithm computation. Please contact the node administrator "
+                    "for more information."
+                )
 
 
 def _get_threshold_placeholder(privacy_threshold: int, allow_zero: bool) -> str:

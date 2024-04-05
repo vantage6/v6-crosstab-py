@@ -28,6 +28,27 @@ records:
   contains only unique values, the result would reveal which unique values are present
   in the column.
 
+- **Setting the allowed columns**: The node administrator can set on which
+  columns they want to allow or disallow the computation of the contingency table by
+  adding the following to the node configuration file:
+
+  .. code:: yaml
+
+    algorithm_env:
+      CROSSTAB_ALLOWED_COLUMNS: ["ageGroup", "isOverweight"]
+      CROSSTAB_DISALLOWED_COLUMNS: ["age", "weight"]
+
+  This configuration will ensure that only the columns `ageGroup` and `isOverweight`
+  are allowed to be used in the computation of the contingency table. The columns `age`
+  and `weight` are disallowed and will not be used in the computation. Usually, there
+  should either be an allowed or disallowed list, but not both: if there is an explicit
+  allowed list, all other columns are automatically disallowed.
+
+  We recommend to define these list to ensure that the contingency table can only be
+  computed for categorical tables, and not for numeric ones. The latter run a risk of
+  revealing that certain values are present in the data. We chose to let the node
+  administrator handle this as they know their own data best.
+
 - **Minimum number of data rows to participate**: A node will only participate if it
   contains at least `n` data rows. This is to prevent nodes with very little data from
   participating in the computation. By default, the minimum number of data rows is set
