@@ -68,8 +68,17 @@ def partial_crosstab(
     )
     info("Contingency table created!")
 
-    # if no values are higher than the threshold, return an error
-    if not (cross_tab_df >= PRIVACY_THRESHOLD).any().any():
+    # if no values are higher than the threshold, return an error. But before doing so,
+    # filter out the N/A values: if a column is requested that contains only unique
+    # values but also empty values, the crosstab would otherwise share unique values as
+    # categories if there are enough empty values to meet the threshold
+    info("Checking if privacy threshold is met by any values...")
+    non_na_crosstab_df = cross_tab_df.drop(columns="N/A", errors="ignore")
+    for col in group_cols:
+        non_na_crosstab_df = non_na_crosstab_df.iloc[
+            non_na_crosstab_df.index.get_level_values(col) != "N/A"
+        ]
+    if not (non_na_crosstab_df >= PRIVACY_THRESHOLD).any().any():
         raise ValueError(
             "No values in the contingency table are higher than the privacy threshold "
             f"of {PRIVACY_THRESHOLD}. Please check if you submitted categorical "

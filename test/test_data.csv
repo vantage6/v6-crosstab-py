@@ -1,6 +1,8 @@
 "Name","Gender","Age","Height(in)","Weight(lbs)","AgeGroup","isOverweight"
 "Alex","M",41,74,170,"40-49",FALSE
+"Alex","M",41,74,170,,FALSE
 "Bert","M",42,68,166,"40-49",FALSE
+"Bert",,42,68,166,"40-49",FALSE
 "Carl","M",32,70,155,"30-39",TRUE
 "Dave","M",39,72,167,"30-39",TRUE
 "Elly","F",30,66,124,"30-39",FALSE
