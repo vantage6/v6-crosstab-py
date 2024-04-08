@@ -11,33 +11,18 @@ The base code for this algorithm has been created via the
 [v6-algorithm-template](https://github.com/vantage6/v6-algorithm-template)
 template generator.
 
-### Checklist
-
-Note that the template generator does not create a completely ready-to-use
-algorithm yet. There are still a number of things you have to do yourself.
-Please ensure to execute the following steps. The steps are also indicated with
-TODO statements in the generated code - so you can also simply search the
-code for TODO instead of following the checklist below.
-
-- [] Fill in the documentation template. This will help others to understand your
-  algorithm, be able to use it safely, and to contribute to it.
-- [] If you want to submit your algorithm to a vantage6 algorithm store, be sure
-  to fill in everything in ``algorithm_store.json`` (and be sure to update
-  it if you change function names, arguments, etc.).
-- [] Finally, remove this checklist section to keep the README clean.
-
-### Dockerizing your algorithm
+## Dockerizing your algorithm
 
 To finally run your algorithm on the vantage6 infrastructure, you need to
 create a Docker image of your algorithm.
 
-#### Automatically
+### Automatically
 
 The easiest way to create a Docker image is to use the GitHub Actions pipeline to
 automatically build and push the Docker image. All that you need to do is push a
 commit to the ``main`` branch.
 
-#### Manually
+### Manually
 
 A Docker image can be created by executing the following command in the root of your
 algorithm directory:
