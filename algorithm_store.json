@@ -8,7 +8,11 @@
       "name": "central_crosstab",
       "description": "Create a contingency table showing the relationship between two or more variables",
       "type": "central",
-      "databases": [],
+      "databases": [
+        {
+          "name": "Database"
+        }
+      ],
       "arguments": [
         {
           "name": "results_col",
@@ -17,12 +21,12 @@
         },
         {
           "name": "group_cols",
-          "type": "list[column]",
+          "type": "column_list",
           "description": "One or more columns to group by. Will be used as the rows in the contingency table"
         },
         {
           "name": "organizations_to_include",
-          "type": "organizations",
+          "type": "organization_list",
           "description": "Organizations to be included in the analysis"
         }
       ]
@@ -44,7 +48,7 @@
         },
         {
           "name": "group_cols",
-          "type": "list[column]",
+          "type": "column_list",
           "description": "One or more columns to group by. Will be used as the rows in the contingency table"
         }
       ]
