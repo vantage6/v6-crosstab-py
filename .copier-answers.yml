@@ -16,7 +16,7 @@ central_function_client: true
 central_function_data: false
 central_function_name: central_crosstab
 copyright: IKNL, 2024
-docker_image: harbor2.vantage6.ai/algorithms/v6-crosstab-py:v4
+docker_image: harbor2.vantage6.ai/algorithms/v6-crosstab-py
 docker_registry: harbor2.vantage6.ai
 has_central_function: true
 has_docs: true

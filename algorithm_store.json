@@ -1,6 +1,6 @@
 {
   "name": "Contingency table",
-  "image": "harbor2.vantage6.ai/algorithms/crosstab:v4",
+  "image": "harbor2.vantage6.ai/algorithms/crosstab",
   "vantage6_version": "4.3",
   "partitioning": "horizontal",
   "functions": [
