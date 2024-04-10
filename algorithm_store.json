@@ -29,6 +29,13 @@
           "type": "organization_list",
           "description": "Organizations to be included in the analysis"
         }
+      ],
+      "ui_visualizations": [
+        {
+            "name": "Contingency table",
+            "description": "Contingency table that shows the relations between the requested variables for all nodes combined.",
+            "type": "table"
+        }
       ]
     },
     {
@@ -50,6 +57,13 @@
           "name": "group_cols",
           "type": "column_list",
           "description": "One or more columns to group by. Will be used as the rows in the contingency table"
+        }
+      ],
+      "ui_visualizations": [
+        {
+            "name": "Contingency table",
+            "description": "Partial contingency table that shows the contingency table shared by this node.",
+            "type": "table"
         }
       ]
     }
