@@ -1,0 +1,71 @@
+{
+  "name": "Contingency table",
+  "image": "harbor2.vantage6.ai/algorithms/crosstab",
+  "vantage6_version": "4.3",
+  "partitioning": "horizontal",
+  "functions": [
+    {
+      "name": "central_crosstab",
+      "description": "Create a contingency table showing the relationship between two or more variables",
+      "type": "central",
+      "databases": [
+        {
+          "name": "Database"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "results_col",
+          "type": "column",
+          "description": "Column to count. Will be used as the columns in the contingency table"
+        },
+        {
+          "name": "group_cols",
+          "type": "column_list",
+          "description": "One or more columns to group by. Will be used as the rows in the contingency table"
+        },
+        {
+          "name": "organizations_to_include",
+          "type": "organization_list",
+          "description": "Organizations to be included in the analysis"
+        }
+      ],
+      "ui_visualizations": [
+        {
+            "name": "Contingency table",
+            "description": "Contingency table that shows the relations between the requested variables for all nodes combined.",
+            "type": "table"
+        }
+      ]
+    },
+    {
+      "name": "partial_crosstab",
+      "description": "",
+      "type": "federated",
+      "databases": [
+        {
+          "name": "Database"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "results_col",
+          "type": "column",
+          "description": "Column to count. Will be used as the columns in the contingency table"
+        },
+        {
+          "name": "group_cols",
+          "type": "column_list",
+          "description": "One or more columns to group by. Will be used as the rows in the contingency table"
+        }
+      ],
+      "ui_visualizations": [
+        {
+            "name": "Contingency table",
+            "description": "Partial contingency table that shows the contingency table shared by this node.",
+            "type": "table"
+        }
+      ]
+    }
+  ]
+}
