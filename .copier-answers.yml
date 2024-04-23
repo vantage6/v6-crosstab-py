@@ -1,0 +1,33 @@
+# DO NOT MODIFY THIS FILE MANUALLY.
+# This file contains the answers to the questions asked by the
+# v6-algorithm-template-creator (using the Copier package). The answers will
+# be updated if you re-run the template creator. Also, the answers in this file
+# may be used to submit your algorithm to a vantage6 algorithm store.
+_commit: 4.3.0-2-g9a130b4
+_src_path: .
+advanced: true
+algorithm_description: Create a contingency table showing the relationship between
+    two or more variables
+algorithm_name: v6-crosstab-py
+author: B. van Beusekom, H. Alradhi, F.C. Martin
+central_args:
+- organizations_to_include
+central_function_client: true
+central_function_data: false
+central_function_name: central_crosstab
+copyright: IKNL, 2024
+docker_image: harbor2.vantage6.ai/algorithms/v6-crosstab-py
+docker_registry: harbor2.vantage6.ai
+has_central_function: true
+has_docs: true
+has_gh_pipeline: true
+has_partial_function: true
+open_source_license: mit
+partial_args: []
+partial_function_client: false
+partial_function_data: true
+partial_function_name: partial_crosstab
+partial_function_number_databases: 1
+private_registry: true
+project_name: v6-crosstab-py
+use_vpn: false
