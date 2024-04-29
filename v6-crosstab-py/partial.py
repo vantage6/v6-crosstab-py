@@ -14,6 +14,10 @@ from typing import Any
 from vantage6.algorithm.tools.util import info, warn, error
 from vantage6.algorithm.tools.decorators import data
 from vantage6.algorithm.tools.util import get_env_var
+from vantage6.algorithm.tools.exceptions import (
+    EnvironmentVariableError,
+    PrivacyThresholdViolation,
+)
 
 from .globals import (
     DEFAULT_PRIVACY_THRESHOLD,
@@ -27,7 +31,7 @@ def partial_crosstab(
     df: pd.DataFrame,
     results_col: str,
     group_cols: list[str],
-) -> Any:
+) -> str:
     """
     Decentral part of the algorithm
 
@@ -39,6 +43,16 @@ def partial_crosstab(
         The column for which counts are calculated
     group_cols : list[str]
         List of one or more columns to group the data by.
+
+    Returns
+    -------
+    str
+        The contingency table as a JSON string.
+
+    Raises
+    ------
+    PrivacyThresholdViolation
+        The privacy threshold is not met by any values in the contingency table.
     """
     # get environment variables with privacy settings
     # pylint: disable=invalid-name
@@ -78,7 +92,7 @@ def partial_crosstab(
             non_na_crosstab_df.index.get_level_values(col) != "N/A"
         ]
     if not (non_na_crosstab_df >= PRIVACY_THRESHOLD).any().any():
-        raise ValueError(
+        raise PrivacyThresholdViolation(
             "No values in the contingency table are higher than the privacy threshold "
             f"of {PRIVACY_THRESHOLD}. Please check if you submitted categorical "
             "variables - if you did, there may simply not be enough data at this node."
@@ -129,20 +143,26 @@ def _do_prestart_privacy_checks(
         The privacy threshold value.
     allow_zero : bool
         The flag indicating whether zero values are allowed.
+
+    Raises
+    ------
+    EnvironmentVariableError
+        The environment variables set by the node are not compatible.
+
     """
     minimum_rows_total = _convert_envvar_to_int(
         "CROSSTAB_MINIMUM_ROWS_TOTAL", DEFAULT_MINIMUM_ROWS_TOTAL
     )
 
     if privacy_threshold == 0 and not allow_zero:
-        raise ValueError(
+        raise EnvironmentVariableError(
             "Privacy threshold is set to 0, but zero values are not allowed. This "
             "directly contradicts each other - please change one of the settings."
         )
 
     # Check if dataframe contains enough rows
     if len(df) < minimum_rows_total:
-        raise ValueError(
+        raise PrivacyThresholdViolation(
             f"Dataframe contains less than {minimum_rows_total} rows. Refusing to "
             "handle this computation, as it may lead to privacy issues."
         )

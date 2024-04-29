@@ -1,0 +1,43 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: vantage6 contingency table algorithm
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Bart
+    family-names: Beusekom
+    name-particle: van
+    email: b.vanbeusekom@iknl.nl
+    affiliation: IKNL
+    orcid: 'https://orcid.org/0000-0002-2183-2901'
+  - given-names: Frank
+    family-names: Martin
+    email: f.martin@iknl.nl
+    affiliation: IKNL
+    orcid: 'https://orcid.org/0000-0002-5897-1569'
+  - given-names: Hasan
+    family-names: Alradhi
+    email: h.alradhi@iknl.nl
+    affiliation: IKNL
+    orcid: 'https://orcid.org/0000-0001-7887-3926'
+# identifiers:
+#   - type: doi
+#     value: 10.5281/zenodo.7221216
+#     description: DOI of the code published on zenodo
+repository-code: 'https://github.com/vantage6/v6-crosstab-py'
+url: 'https://vantage6.ai/'
+abstract: >+
+  An algorithm that calculates a contingency table for a given dataset.
+
+keywords:
+  - crosstable
+  - contingency table
+  - data analysis
+  - vantage6
+  - privacy enhancing technology
+  - personal health train
+license: MIT

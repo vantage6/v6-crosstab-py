@@ -91,20 +91,21 @@ def _aggregate_results(results: dict, group_cols: list[str]) -> pd.DataFrame:
     """
     # The results are pandas dictionaries converted to JSON. Convert them back and
     # then add them together to get the final partial_df.
-    results = [pd.read_json(StringIO(result)) for result in results]
-
-    # set group cols as index
-    for idx, df in enumerate(results):
-        results[idx] = df.set_index(group_cols)
+    partial_dfs = []
+    for result in results:
+        df = pd.read_json(StringIO(result))
+        # set group cols as index
+        df.set_index(group_cols, inplace=True)
+        partial_dfs.append(df)
 
     # Get all unique values for the result column
-    all_result_levels = list(set([col for df in results for col in df.columns]))
+    all_result_levels = list(set([col for df in partial_dfs for col in df.columns]))
 
     # The partial results are already in the form of a contingency table, but they
     # contain ranges (e.g. "0-5"). These are converted to two columns: one for the
     # minimum value and one for the maximum value.
     converted_results = []
-    for partial_df in results:
+    for partial_df in partial_dfs:
         # expand the ranges to min and max values
         orig_columns = partial_df.columns
         for col in orig_columns:

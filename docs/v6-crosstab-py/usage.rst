@@ -4,21 +4,22 @@ How to use
 Input arguments
 ---------------
 
-Input arguments
----------------
-
 .. list-table::
    :widths: 20 80
    :header-rows: 1
 
    * - Argument
+     - Type
      - Description
    * - ``results_col``
+     - Column name (string)
      - The column whose categories will be the columns of the contingency table.
    * - ``group_cols``
+     - List of column names (list of strings)
      - One or more columns whose categories, or combinations of categories, will be the
        rows of the contingency table.
    * - ``organizations_to_include``
+     - List of integers
      - Which organizations to include in the computation.
 
 Python client example
