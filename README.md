@@ -1,3 +1,7 @@
+<h1 align="center">
+  <br>
+  <a href="https://vantage6.ai"><img src="https://github.com/IKNL/guidelines/blob/master/resources/logos/vantage6.png?raw=true" alt="vantage6" width="350"></a>
+</h1>
 
 # v6-crosstab-py
 
@@ -11,6 +15,14 @@ The base code for this algorithm has been created via the
 [v6-algorithm-template](https://github.com/vantage6/v6-algorithm-template)
 template generator.
 
+## Docker image
+
+The Docker image that contains this algorithm can be retrieved with:
+
+```
+docker pull harbor2.vantage6.ai/algorithms/crosstab
+```
+
 ## Dockerizing your algorithm
 
 To finally run your algorithm on the vantage6 infrastructure, you need to
@@ -20,7 +32,7 @@ create a Docker image of your algorithm.
 
 The easiest way to create a Docker image is to use the GitHub Actions pipeline to
 automatically build and push the Docker image. All that you need to do is push a
-commit to the ``main`` branch.
+commit to the `main` branch.
 
 ### Manually
 
