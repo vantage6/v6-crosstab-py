@@ -3,7 +3,7 @@
 # v6-algorithm-template-creator (using the Copier package). The answers will
 # be updated if you re-run the template creator. Also, the answers in this file
 # may be used to submit your algorithm to a vantage6 algorithm store.
-_commit: 4.3.0-2-g9a130b4
+_commit: 4.3.0
 _src_path: .
 advanced: true
 algorithm_description: Create a contingency table showing the relationship between
