@@ -191,7 +191,7 @@ def _aggregate_results(
             + [total_total]
         )
 
-    results = {"contingency_table": aggregated_df.to_json(orient="records")}
+    results = {"contingency_table": aggregated_df.to_dict(orient="records")}
     if include_chi2:
         results.update({"chi2": {"chi2": chi2, "P-value": chi2_pvalue}})
     return results
@@ -220,9 +220,10 @@ def compute_chi_squared(
     """
     info("Computing chi-squared statistic...")
 
-    # for minimum values, remove rows with only zeros
+    # for minimum values, remove rows/columns with only zeros
     min_df = contingency_table[min_colnames]
     min_df = min_df.loc[(min_df != 0).any(axis=1)]
+    min_df = min_df.loc[:, (min_df != 0).any(axis=0)]
     max_df = contingency_table[max_colnames]
 
     chi2_min = scipy.stats.chi2_contingency(min_df)
