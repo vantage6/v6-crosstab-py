@@ -102,7 +102,7 @@ def partial_crosstab(
     info("Replacing values below threshold with privacy-enhancing values...")
     replace_value = 1 if ALLOW_ZERO else 0
     replace_condition = (
-        (cross_tab_df >= PRIVACY_THRESHOLD) & (cross_tab_df == 0)
+        (cross_tab_df >= PRIVACY_THRESHOLD) | (cross_tab_df == 0)
         if ALLOW_ZERO
         else (cross_tab_df >= PRIVACY_THRESHOLD)
     )
@@ -116,6 +116,7 @@ def partial_crosstab(
     cross_tab_df = cross_tab_df.astype(str).where(
         replace_condition, BELOW_THRESHOLD_PLACEHOLDER
     )
+
     # reset index to ensure that groups are passed along to central part
     cross_tab_df = cross_tab_df.reset_index()
 
