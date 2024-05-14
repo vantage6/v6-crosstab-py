@@ -19,5 +19,5 @@ setup(
     url="https://github.com/vantage6/v6-crosstab-py",
     packages=find_packages(),
     python_requires=">=3.10",
-    install_requires=["vantage6-algorithm-tools", "pandas"],
+    install_requires=["vantage6-algorithm-tools", "pandas", "scipy"],
 )
