@@ -1,5 +1,4 @@
 from os import path
-from codecs import open
 from setuptools import setup, find_packages
 
 # we're using a README.md, if you do not have this in your folder, simply
