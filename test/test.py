@@ -52,8 +52,9 @@ central_task = client.task.create(
         "kwargs": {
             "organizations_to_include": org_ids,
             "results_col": "Gender",
-            "group_cols": ["isOverweight", "AgeGroup"],
-            # "group_cols": ["isOverweight"],
+            # "group_cols": ["isOverweight", "AgeGroup"],
+            "group_cols": ["isOverweight"],
+            # "include_chi2": False,
         },
     },
     organizations=[org_ids[0]],

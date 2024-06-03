@@ -17,6 +17,7 @@ import os
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "v6-crosstab-py"
+# pylint: disable=redefined-builtin
 copyright = ""
 author = "B. van Beusekom, H. Alradhi, F.C. Martin"
 

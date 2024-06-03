@@ -1,5 +1,5 @@
-Overview
-========
+Contingency table
+=================
 
 Description
 -----------

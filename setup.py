@@ -1,5 +1,4 @@
 from os import path
-from codecs import open
 from setuptools import setup, find_packages
 
 # we're using a README.md, if you do not have this in your folder, simply
@@ -19,5 +18,5 @@ setup(
     url="https://github.com/vantage6/v6-crosstab-py",
     packages=find_packages(),
     python_requires=">=3.10",
-    install_requires=["vantage6-algorithm-tools", "pandas"],
+    install_requires=["vantage6-algorithm-tools", "pandas", "scipy"],
 )

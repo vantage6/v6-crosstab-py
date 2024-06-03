@@ -7,11 +7,9 @@ encryption if that is enabled). From there, they are sent to the partial task
 or directly to the user (if they requested partial results).
 """
 
-import os
 import pandas as pd
-from typing import Any
 
-from vantage6.algorithm.tools.util import info, warn, error
+from vantage6.algorithm.tools.util import info
 from vantage6.algorithm.tools.decorators import data
 from vantage6.algorithm.tools.util import get_env_var
 from vantage6.algorithm.tools.exceptions import (
@@ -102,7 +100,7 @@ def partial_crosstab(
     info("Replacing values below threshold with privacy-enhancing values...")
     replace_value = 1 if ALLOW_ZERO else 0
     replace_condition = (
-        (cross_tab_df >= PRIVACY_THRESHOLD) & (cross_tab_df == 0)
+        (cross_tab_df >= PRIVACY_THRESHOLD) | (cross_tab_df == 0)
         if ALLOW_ZERO
         else (cross_tab_df >= PRIVACY_THRESHOLD)
     )
@@ -116,6 +114,7 @@ def partial_crosstab(
     cross_tab_df = cross_tab_df.astype(str).where(
         replace_condition, BELOW_THRESHOLD_PLACEHOLDER
     )
+
     # reset index to ensure that groups are passed along to central part
     cross_tab_df = cross_tab_df.reset_index()
 

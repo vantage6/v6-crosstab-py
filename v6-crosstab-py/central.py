@@ -7,8 +7,9 @@ encryption if that is enabled).
 """
 
 from typing import Any
-import pandas as pd
 from io import StringIO
+import pandas as pd
+import scipy
 
 from vantage6.algorithm.tools.util import info
 from vantage6.algorithm.tools.decorators import algorithm_client
@@ -21,6 +22,8 @@ def central_crosstab(
     results_col: str,
     group_cols: list[str],
     organizations_to_include: list[int] = None,
+    include_chi2: bool = True,
+    include_totals: bool = True,
 ) -> Any:
     """
     Central part of the algorithm
@@ -36,6 +39,10 @@ def central_crosstab(
     organizations_to_include : list[int], optional
         List of organization ids to include in the computation. If not provided, all
         organizations in the collaboration are included.
+    include_chi2 : bool, optional
+        Whether to include the chi-squared statistic in the results.
+    include_totals : bool, optional
+        Whether to include totals in the contingency table.
     """
     # get all organizations (ids) within the collaboration so you can send a
     # task to them.
@@ -70,10 +77,12 @@ def central_crosstab(
     info("Results obtained!")
 
     # return the final results of the algorithm
-    return _aggregate_results(results, group_cols)
+    return _aggregate_results(results, group_cols, include_chi2, include_totals)
 
 
-def _aggregate_results(results: dict, group_cols: list[str]) -> pd.DataFrame:
+def _aggregate_results(
+    results: dict, group_cols: list[str], include_chi2: bool, include_totals: bool
+) -> pd.DataFrame:
     """
     Aggregate the results of the partial computations.
 
@@ -83,6 +92,10 @@ def _aggregate_results(results: dict, group_cols: list[str]) -> pd.DataFrame:
         List of JSON data containing the partial results.
     group_cols : list[str]
         List of columns that were used to group the data.
+    include_chi2 : bool
+        Whether to include the chi-squared statistic in the results.
+    include_totals : bool
+        Whether to include totals in the contingency table.
 
     Returns
     -------
@@ -139,21 +152,28 @@ def _aggregate_results(results: dict, group_cols: list[str]) -> pd.DataFrame:
             aggregated_df.index, names=group_cols
         )
 
+    min_colnames = [f"{col}_min" for col in orig_columns]
+    max_colnames = [f"{col}_max" for col in orig_columns]
+    # Compute chi-squared statistic
+    if include_chi2:
+        chi2, chi2_pvalue = compute_chi_squared(
+            aggregated_df, min_colnames, max_colnames
+        )
+
+    if include_totals:
+        col_totals, row_totals, total_total = _compute_totals(
+            aggregated_df, min_colnames, max_colnames
+        )
+
     # Convert back to strings so that we can add ranges
     aggregated_df = aggregated_df.astype(str)
 
     # Finally, we need to combine the min and max values back into ranges
     min_max_cols = aggregated_df.columns
     for level in all_result_levels:
-        # first, simply concatenate the columns
-        aggregated_df[level] = (
-            aggregated_df[f"{level}_min"] + "-" + aggregated_df[f"{level}_max"]
+        aggregated_df[level] = _concatenate_min_max(
+            aggregated_df[f"{level}_min"], aggregated_df[f"{level}_max"]
         )
-        # then, remove extra text where min and max are the same
-        min_max_same = aggregated_df[f"{level}_min"] == aggregated_df[f"{level}_max"]
-        aggregated_df.loc[min_max_same, level] = aggregated_df.loc[
-            min_max_same, level
-        ].str.replace(r"-(\d+)", "", regex=True)
 
     # clean up: drop the min and max columns
     aggregated_df.drop(min_max_cols, axis=1, inplace=True)
@@ -161,4 +181,132 @@ def _aggregate_results(results: dict, group_cols: list[str]) -> pd.DataFrame:
     # reset index to pass the group columns along to results
     aggregated_df = aggregated_df.reset_index()
 
-    return aggregated_df.to_json(orient="records")
+    # add totals ranges
+    if include_totals:
+        aggregated_df["Total"] = row_totals
+        aggregated_df.loc[len(aggregated_df)] = (
+            ["Total"]
+            + ["" for _ in group_cols[1:]]
+            + col_totals.tolist()
+            + [total_total]
+        )
+
+    results = {"contingency_table": aggregated_df.to_dict(orient="records")}
+    if include_chi2:
+        results.update({"chi2": {"chi2": chi2, "P-value": chi2_pvalue}})
+    return results
+
+
+def compute_chi_squared(
+    contingency_table: pd.DataFrame, min_colnames: list[str], max_colnames: list[str]
+) -> tuple[str]:
+    """
+    Compute chi squared statistic based on the contingency table
+
+    Parameters
+    ----------
+    contingency_table : pd.DataFrame
+        The contingency table.
+    min_colnames : list[str]
+        List of column names for the minimum values of each range.
+    max_colnames : list[str]
+        List of column names for the maximum values of each range.
+
+    Returns
+    -------
+    tuple[str]
+        Tuple containing the chi-squared statistics and pvalues. If the contingency
+        table contains ranges, the statistics and pvalues are also returned as a range.
+    """
+    info("Computing chi-squared statistic...")
+
+    # for minimum values, remove rows/columns with only zeros
+    min_df = contingency_table[min_colnames]
+    min_df = min_df.loc[(min_df != 0).any(axis=1)]
+    min_df = min_df.loc[:, (min_df != 0).any(axis=0)]
+    max_df = contingency_table[max_colnames]
+
+    chi2_min = scipy.stats.chi2_contingency(min_df)
+    chi2_max = scipy.stats.chi2_contingency(max_df)
+
+    if chi2_min.statistic == chi2_max.statistic:
+        return str(chi2_min.statistic), str(chi2_min.pvalue)
+
+    # note that if giving a range, MAX goes before MIN, because the values of the
+    # statistic are actually larger for the minimum side of the range, because then the
+    # difference with the average is larger than for the maximum side of the range
+    # (p-value is not reversed as that is again the reverse of the statistic :-))
+    return (
+        f"{chi2_max.statistic} - {chi2_min.statistic}",
+        f"{chi2_min.pvalue} - {chi2_max.pvalue}",
+    )
+
+
+def _compute_totals(
+    contingency_table: pd.DataFrame, min_colnames: list[str], max_colnames: list[str]
+) -> tuple:
+    """
+    Compute the totals for the contingency table.
+
+    Parameters
+    ----------
+    contingency_table : pd.DataFrame
+        The contingency table.
+    min_colnames : list[str]
+        List of column names for the minimum values of each range.
+    max_colnames : list[str]
+        List of column names for the maximum values of each range.
+
+    Returns
+    -------
+    tuple
+        Tuple containing the column totals, row totals, and the sum of all data points.
+    """
+    # Add totals
+    min_row_totals = contingency_table[min_colnames].sum(axis=1)
+    min_col_totals = contingency_table[min_colnames].sum(axis=0)
+    max_row_totals = contingency_table[max_colnames].sum(axis=1)
+    max_col_totals = contingency_table[max_colnames].sum(axis=0)
+
+    min_total_total = min_row_totals.sum()
+    max_total_total = max_row_totals.sum()
+    if min_total_total != max_total_total:
+        total_total = f"{min_total_total} - {max_total_total}"
+    else:
+        total_total = str(min_total_total)
+
+    min_row_totals = min_row_totals.astype(str).reset_index(drop=True)
+    min_col_totals = min_col_totals.astype(str).reset_index(drop=True)
+    max_row_totals = max_row_totals.astype(str).reset_index(drop=True)
+    max_col_totals = max_col_totals.astype(str).reset_index(drop=True)
+
+    # check if the totals are the same
+    col_totals = _concatenate_min_max(min_col_totals, max_col_totals)
+    row_totals = _concatenate_min_max(min_row_totals, max_row_totals)
+    return col_totals, row_totals, total_total
+
+
+def _concatenate_min_max(min_col: pd.Series, max_col: pd.Series) -> pd.Series:
+    """
+    Concatenate two columns into a single column with ranges.
+
+    Parameters
+    ----------
+    min_col : pd.Series
+        The column with minimum values.
+    max_col : pd.Series
+        The column with maximum values.
+
+    Returns
+    -------
+    pd.Series
+        The concatenated column.
+    """
+    # first, simply concatenate the columns
+    result = min_col + "-" + max_col
+    # then, remove extra text where min and max are the same
+    min_max_same = min_col == max_col
+    result.loc[min_max_same] = result.loc[min_max_same].str.replace(
+        r"-(\d+)", "", regex=True
+    )
+    return result
