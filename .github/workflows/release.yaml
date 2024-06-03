@@ -4,7 +4,7 @@ on:
   push:
     tags:
       # match tags a.b.c with optional prereleases ([a|b|rc]d) at the end
-      - ^[1-9]\d*\.[1-9]\d*\.[1-9]\d*([ab]|rc)?\d*$
+      - ^[1-9]\d*\.[0-9]\d*\.[0-9]\d*([ab]|rc)?\d*$
 
 jobs:
   # From the tag we split the individual version components:
