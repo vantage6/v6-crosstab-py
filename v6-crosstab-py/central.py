@@ -162,7 +162,7 @@ def _aggregate_results(
 
     if include_totals:
         col_totals, row_totals, total_total = _compute_totals(
-            aggregated_df, min_colnames, max_colnames
+            aggregated_df, min_colnames, max_colnames, orig_columns
         )
 
     # Convert back to strings so that we can add ranges
@@ -183,6 +183,10 @@ def _aggregate_results(
 
     # add totals ranges
     if include_totals:
+        # ensure columns are ordered same in totals as in the rest of the table
+        column_order = aggregated_df.columns[len(group_cols) :]
+        col_totals = col_totals.reindex(column_order)
+        # add totals
         aggregated_df["Total"] = row_totals
         aggregated_df.loc[len(aggregated_df)] = (
             ["Total"]
@@ -243,7 +247,10 @@ def compute_chi_squared(
 
 
 def _compute_totals(
-    contingency_table: pd.DataFrame, min_colnames: list[str], max_colnames: list[str]
+    contingency_table: pd.DataFrame,
+    min_colnames: list[str],
+    max_colnames: list[str],
+    orig_columns: list[str],
 ) -> tuple:
     """
     Compute the totals for the contingency table.
@@ -256,6 +263,8 @@ def _compute_totals(
         List of column names for the minimum values of each range.
     max_colnames : list[str]
         List of column names for the maximum values of each range.
+    orig_columns : list[str]
+        List of original column names.
 
     Returns
     -------
@@ -282,6 +291,7 @@ def _compute_totals(
 
     # check if the totals are the same
     col_totals = _concatenate_min_max(min_col_totals, max_col_totals)
+    col_totals.index = orig_columns
     row_totals = _concatenate_min_max(min_row_totals, max_row_totals)
     return col_totals, row_totals, total_total
 
