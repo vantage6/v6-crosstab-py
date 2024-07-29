@@ -18,7 +18,7 @@ import os
 
 project = "v6-crosstab-py"
 # pylint: disable=redefined-builtin
-copyright = ""
+copyright = "IKNL, 2024"
 author = "B. van Beusekom, H. Alradhi, F.C. Martin"
 
 # -- General configuration ---------------------------------------------------
