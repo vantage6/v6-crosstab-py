@@ -18,7 +18,7 @@ image:
 	@echo "Building ${REGISTRY}/algorithms/crosstab:${TAG}-v6-${VANTAGE6_VERSION}"
 	@echo "Building ${REGISTRY}/algorithms/crosstab:latest"
 	docker buildx build \
-		--tag ${REGISTRY}/algorithms/crosstab:${TAG} \
+		--tag ${REGISTRY}/algorithms/crosstab:${TAG}-v6-${VANTAGE6_VERSION} \
 		--tag ${REGISTRY}/algorithms/crosstab:latest \
 		--platform ${PLATFORMS} \
 		-f ./Dockerfile \
