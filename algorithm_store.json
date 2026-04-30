@@ -97,5 +97,5 @@
     }
   ],
   "description": "Compute a contingency table of two or more variables. Optionally compute a chi2 statistic.",
-  "image": "harbor2.vantage6.ai/algorithms/crosstab"
+  "image": "ghcr.io/vantage6/algorithm/crosstab"
 }

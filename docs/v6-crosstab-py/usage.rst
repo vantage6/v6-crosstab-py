@@ -101,7 +101,7 @@ vantage6 server.
       organizations=[1],
       name='Compute contingency table',
       description='Create a contingency table showing the relationship between two or more variables',
-      image='harbor2.vantage6.ai/algorithms/v6-crosstab-py:latest',
+      image='ghcr.io/vantage6/algorithm/crosstab:latest',
       input=input_,
       databases=[
           {'label': 'default'}

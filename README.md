@@ -18,7 +18,7 @@ This algorithm creates a contingency table showing the relationship between two 
 variables. The docker image is available at:
 
 ```bash
-docker pull harbor2.vantage6.ai/algorithms/crosstab
+docker pull ghcr.io/vantage6/algorithm/crosstab
 ```
 
 It is designed to be run with the [vantage6](https://vantage6.ai)
@@ -43,52 +43,5 @@ make livehtml
 The Docker image that contains this algorithm can be retrieved with:
 
 ```
-docker pull harbor2.vantage6.ai/algorithms/crosstab
+docker pull ghcr.io/vantage6/algorithm/crosstab
 ```
-
-## Dockerizing your algorithm
-
-To finally run your algorithm on the vantage6 infrastructure, you need to
-create a Docker image of your algorithm.
-
-### Automatically
-
-The easiest way to create a Docker image is to use the GitHub Actions pipeline to
-automatically build and push the Docker image. All that you need to do is push a
-commit to the `main` branch.
-
-### Manually
-
-A Docker image can be created by executing the following command in the root of your
-algorithm directory:
-
-```bash
-docker build -t [my_docker_image_name] .
-```
-
-where you should provide a sensible value for the Docker image name. The
-`docker build` command will create a Docker image that contains your algorithm.
-You can create an additional tag for it by running
-
-```bash
-docker tag [my_docker_image_name] [another_image_name]
-```
-
-This way, you can e.g. do
-`docker tag local_average_algorithm harbor2.vantage6.ai/algorithms/average` to
-make the algorithm available on a remote Docker registry (in this case
-`harbor2.vantage6.ai`).
-
-Finally, you need to push the image to the Docker registry. This can be done
-by running
-
-```bash
-docker push [my_docker_image_name]
-```
-
-Note that you need to be logged in to the Docker registry before you can push
-the image. You can do this by running `docker login` and providing your
-credentials. Check [this page](https://docs.docker.com/get-started/04_sharing_app/)
-For more details on sharing images on Docker Hub. If you are using a different
-Docker registry, check the documentation of that registry and be sure that you
-have sufficient permissions.
