@@ -97,5 +97,5 @@
     }
   ],
   "description": "Compute a contingency table of two or more variables. Optionally compute a chi2 statistic.",
-  "image": "ghcr.io/vantage6/algorithm/crosstab"
+  "image": "ghcr.io/vantage6/algorithm/crosstab:4"
 }
