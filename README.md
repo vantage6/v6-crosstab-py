@@ -26,6 +26,16 @@ infrastructure for distributed analysis and learning. The base code for this alg
 has been created via the [v6-algorithm-template](https://github.com/vantage6/v6-algorithm-template)
 generator.
 
+## Running the algorithm
+
+Data is no longer loaded automatically inside compute functions. In a session, run a **data extraction** step first (for example `read_csv` from [v6-extract-basics-py](https://github.com/vantage6/v6-extract-basics-py)), then run **`central_crosstab`** with `results_col`, `group_cols`, and optional flags such as `include_chi2` and `include_totals`.
+
+## Build
+
+```bash
+make image
+```
+
 ## Documentation
 
 The documentation is hosted [here](https://algorithms.vantage6.ai/en/latest/v6-crosstab-py/implementation.html).

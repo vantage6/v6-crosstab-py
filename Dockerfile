@@ -1,5 +1,4 @@
-# basic python3 image as base
-ARG BASE=4.15
+ARG BASE=5.0
 FROM ghcr.io/vantage6/infrastructure/algorithm-base:${BASE}
 
 # This is a placeholder that should be overloaded by invoking
@@ -8,7 +7,7 @@ ARG PKG_NAME="v6-crosstab-py"
 
 # install federated algorithm
 COPY . /app
-RUN pip install /app
+RUN uv pip install --system -e /app
 
 
 # Set environment variable to make name of the package available within the

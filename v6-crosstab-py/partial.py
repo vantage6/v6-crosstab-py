@@ -9,9 +9,10 @@ or directly to the user (if they requested partial results).
 
 import pandas as pd
 
-from vantage6.algorithm.tools.util import info
-from vantage6.algorithm.tools.decorators import data
+from vantage6.common import info
 from vantage6.algorithm.tools.util import get_env_var
+from vantage6.algorithm.decorator.action import federated
+from vantage6.algorithm.decorator.data import dataframe
 from vantage6.algorithm.tools.exceptions import (
     EnvironmentVariableError,
     PrivacyThresholdViolation,
@@ -24,7 +25,8 @@ from .globals import (
 )
 
 
-@data(1)
+@federated
+@dataframe(1)
 def partial_crosstab(
     df: pd.DataFrame,
     results_col: str,
