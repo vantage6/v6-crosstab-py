@@ -11,17 +11,19 @@ from io import StringIO
 import pandas as pd
 import scipy
 
-from vantage6.algorithm.tools.util import info
-from vantage6.algorithm.tools.decorators import algorithm_client
+from vantage6.common import info
+from vantage6.algorithm.decorator.algorithm_client import algorithm_client
+from vantage6.algorithm.decorator.action import central
 from vantage6.algorithm.client import AlgorithmClient
 
 
+@central
 @algorithm_client
 def central_crosstab(
     client: AlgorithmClient,
     results_col: str,
     group_cols: list[str],
-    organizations_to_include: list[int] = None,
+    organizations_to_include: list[int] | None = None,
     include_chi2: bool = True,
     include_totals: bool = True,
 ) -> Any:
@@ -36,7 +38,7 @@ def central_crosstab(
         The column for which counts are calculated
     group_cols : list[str]
         List of one or more columns to group the data by.
-    organizations_to_include : list[int], optional
+    organizations_to_include : list[int] | None
         List of organization ids to include in the computation. If not provided, all
         organizations in the collaboration are included.
     include_chi2 : bool, optional
@@ -52,20 +54,13 @@ def central_crosstab(
             organization.get("id") for organization in organizations
         ]
 
-    # Define input parameters for a subtask
-    info("Defining input parameters")
-    input_ = {
-        "method": "partial_crosstab",
-        "kwargs": {
+    info("Creating subtask to compute partial contingency tables")
+    task = client.task.create(
+        method="partial_crosstab",
+        arguments={
             "results_col": results_col,
             "group_cols": group_cols,
         },
-    }
-
-    # create a subtask for all organizations in the collaboration.
-    info("Creating subtask to compute partial contingency tables")
-    task = client.task.create(
-        input_=input_,
         organizations=organizations_to_include,
         name="Partial crosstabulation",
         description="Contingency table for each organization",
