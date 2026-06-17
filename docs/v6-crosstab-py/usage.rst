@@ -21,6 +21,22 @@ Input arguments
    * - ``organizations_to_include``
      - List of integers
      - Which organizations to include in the computation.
+   * - ``include_chi2``
+     - Boolean
+     - Whether to include the chi-squared statistic in the results. Defaults to
+       ``True``.
+   * - ``include_totals``
+     - Boolean
+     - Whether to include row and column totals in the contingency table. Defaults to
+       ``True``.
+
+Session workflow
+----------------
+
+Ensure that you have loaded the data into a dataframe in a session. To do so, run a
+**data extraction** step first (for example ``read_csv`` from
+`v6-extract-basics-py <https://github.com/vantage6/v6-extract-basics-py>`_). Data
+extraction functions are not included in this algorithm.
 
 Python client example
 ---------------------
@@ -88,24 +104,23 @@ vantage6 server.
   client.setup_encryption(private_key)
   client.authenticate(username, password)
 
-  input_ = {
-    'method': 'central_crosstab',
-    'kwargs': {
-        'results_col': 'Gender',
-        'group_cols': ["AgeGroup", "isOverweight"]
-    }
-  }
-
   my_task = client.task.create(
       collaboration=1,
       organizations=[1],
       name='Compute contingency table',
       description='Create a contingency table showing the relationship between two or more variables',
       image='ghcr.io/vantage6/algorithm/crosstab:latest',
-      input=input_,
+      method='central_crosstab',
+      arguments={
+          'results_col': 'Gender',
+          'group_cols': ["AgeGroup", "isOverweight"],
+          'include_chi2': True,
+          'include_totals': True,
+      },
+      session=1,  # replace with your session id
       databases=[
-          {'label': 'default'}
-      ]
+          {'type': 'dataframe', 'dataframe_id': 1},
+      ],
   )
 
   task_id = my_task.get('id')
