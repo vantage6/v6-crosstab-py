@@ -117,18 +117,18 @@ def _aggregate_results(
         # expand the ranges to min and max values
         orig_columns = partial_df.columns
         for col in orig_columns:
-            if partial_df[col].dtype == "object":
-                # if the column contains a range, split it into two columns
+            if pd.api.types.is_numeric_dtype(partial_df[col]):
+                # column is already numeric: simply copy it to the new columns
+                partial_df[f"{col}_min"] = partial_df[col]
+                partial_df[f"{col}_max"] = partial_df[col]
+            else:
+                # privacy placeholders and counts may be strings (e.g. "0-4", "5")
                 partial_df[[f"{col}_min", f"{col}_max"]] = partial_df[col].str.split(
                     "-", expand=True
                 )
                 partial_df[f"{col}_max"] = partial_df[f"{col}_max"].fillna(
                     partial_df[f"{col}_min"]
                 )
-            else:
-                # column is already numeric: simply copy it to the new columns
-                partial_df[f"{col}_min"] = partial_df[col]
-                partial_df[f"{col}_max"] = partial_df[col]
         # drop the original columns
         partial_df.drop(columns=orig_columns, inplace=True)
         # convert to numeric
