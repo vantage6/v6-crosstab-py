@@ -110,6 +110,36 @@ def test_partial_crosstab():
     assert "Gender" in partial_result[0] or "M" in partial_result[0]
 
 
+def test_central_with_privacy_placeholders():
+    """Central aggregation should handle privacy range placeholders like '0-4'."""
+    import importlib
+    from io import StringIO
+
+    central = importlib.import_module("v6-crosstab-py.central")
+    partial_json = (
+        pd.DataFrame(
+            [
+                {"Gender": "M", "0-4": "0-4", "40-49": "12"},
+                {"Gender": "F", "0-4": "3", "40-49": "0-4"},
+            ]
+        )
+        .astype(str)
+        .to_json(orient="records")
+    )
+
+    # pandas may infer string columns instead of object when reading JSON
+    partial_json_nullable = pd.read_json(
+        StringIO(partial_json), dtype_backend="numpy_nullable"
+    ).to_json(orient="records")
+
+    results = central._aggregate_results(
+        [partial_json_nullable], ["Gender"], include_chi2=False, include_totals=False
+    )
+    table = pd.DataFrame(results["contingency_table"])
+    assert "0-4" in table.columns
+    assert "40-49" in table.columns
+
+
 def test_central_without_chi2():
     """Test central method without chi-squared statistic."""
     central_task = client.task.create(
